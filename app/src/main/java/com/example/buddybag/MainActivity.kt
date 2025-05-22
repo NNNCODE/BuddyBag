@@ -7,7 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.buddybag.data.ChecklistItem
 import com.example.buddybag.data.Phrase
+import com.example.buddybag.ui.ChecklistScreen
 import com.example.buddybag.ui.HomeScreen
 import com.example.buddybag.ui.PhrasebookScreen
 import com.example.buddybag.ui.theme.BuddyBagTheme
@@ -29,21 +31,32 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
 
             BuddyBagTheme {
+                val checklistItems = listOf(
+                    ChecklistItem("CAF Registration", "Housing subsidy", false),
+                    ChecklistItem("Ameli (Health Insurance)", "Create an Ameli account", false),
+                    ChecklistItem("Open a bank account", "LCL, SG, BNP, Revolut etc.", false),
+                    ChecklistItem("Get student card", "From your school", false),
+                    ChecklistItem("OFII registration", "For non-EU students", false)
+                )
                 // Navigation host controlling screen routes
                 NavHost(navController = navController, startDestination = "home") {
                     composable("home") {
+
                         HomeScreen(
                             onNavigateToPhrasebook = {
                                 navController.navigate("phrasebook")
                             },
-                            onNavigateToChecklist = { /* TODO: Navigate to Checklist Screen */ },
+                            onNavigateToChecklist = { navController.navigate("checklist")},
                             onNavigateToShoppingList = { /* TODO: Navigate to Shopping List Screen */ },
                             onNavigateToHelp = { /* TODO: Navigate to Help Screen */ }
+
                         )
                     }
-
                     composable("phrasebook") {
                         PhrasebookScreen(phrases = fakePhrases)
+                    }
+                    composable("checklist") {
+                        ChecklistScreen(initialItems = checklistItems)
                     }
                 }
             }

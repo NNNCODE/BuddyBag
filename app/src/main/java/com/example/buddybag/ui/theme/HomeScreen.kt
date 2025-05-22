@@ -27,7 +27,10 @@ fun HomeScreen(
         )
 
         // Navigation buttons for each functional module
-        Button(onClick = onNavigateToPhrasebook, modifier = Modifier.fillMaxWidth()) {
+        Button(
+            onClick = onNavigateToPhrasebook,
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text("📖 Phrasebook")
         }
 
@@ -42,8 +45,10 @@ fun HomeScreen(
         Button(onClick = onNavigateToHelp, modifier = Modifier.fillMaxWidth()) {
             Text("🆘 Local Life Guide")
         }
-    }
 
-    // Optional debug message to verify screen rendering
-    Text(text = "✅ HomeScreen rendered")
+        Text(
+            text = "✅ HomeScreen rendered",
+            modifier = Modifier.padding(top = 16.dp)
+        )
+    }
 }
