@@ -39,17 +39,6 @@ class MainActivity : ComponentActivity() {
             )
         )
 
-        setContent {
-            val navController = rememberNavController()
-
-            BuddyBagTheme {
-                val checklistItems = listOf(
-                    ChecklistItem("CAF Registration", "Housing subsidy", false),
-                    ChecklistItem("Ameli (Health Insurance)", "Create an Ameli account", false),
-                    ChecklistItem("Open a bank account", "LCL, SG, BNP, Revolut etc.", false),
-                    ChecklistItem("Get student card", "From your school", false),
-                    ChecklistItem("OFII registration", "For non-EU students", false)
-                )
         val checklistItems = listOf(
             ChecklistItem("CAF Registration", "Housing subsidy", false),
             ChecklistItem("Ameli (Health Insurance)", "Create an Ameli account", false),
