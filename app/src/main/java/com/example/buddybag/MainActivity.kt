@@ -8,9 +8,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.buddybag.data.ChecklistItem
+import com.example.buddybag.data.HelpItem
 import com.example.buddybag.data.Phrase
 import com.example.buddybag.data.ShoppingItem
 import com.example.buddybag.ui.ChecklistScreen
+import com.example.buddybag.ui.HelpGuideScreen
 import com.example.buddybag.ui.HomeScreen
 import com.example.buddybag.ui.PhrasebookScreen
 import com.example.buddybag.ui.ShoppingListScreen
@@ -54,6 +56,14 @@ class MainActivity : ComponentActivity() {
             ShoppingItem("Toothpaste", false),
             ShoppingItem("Shampoo", false)
         )
+        val helpItems = listOf(
+            HelpItem("Buy a SIM Card", "Orange, SFR, Free Mobile, Bouygues — visit the nearest telecom store."),
+            HelpItem("Get a Navigo card", "Use it to access buses, metro and RER in Île-de-France."),
+            HelpItem("Grocery Stores", "Franprix, Lidl, Carrefour, Auchan, or Asian/Arab markets."),
+            HelpItem("Emergency Numbers", "112 (EU general), 15 (medical), 17 (police), 18 (fire)."),
+            HelpItem("See a Doctor", "Find local GPs (médecins traitants) on Doctolib.fr")
+        )
+
 
         setContent {
             val navController = rememberNavController()
@@ -74,7 +84,9 @@ class MainActivity : ComponentActivity() {
                             onNavigateToShoppingList = {
                                 navController.navigate("shopping")
                             },
-                            onNavigateToHelp = { /* TODO: Navigate to Help Screen */ }
+                            onNavigateToHelp = {
+                                navController.navigate("help")
+                            }
 
                         )
                     }
@@ -87,6 +99,10 @@ class MainActivity : ComponentActivity() {
                     composable("shopping") {
                         ShoppingListScreen(initialItems = shoppingItems)
                     }
+                    composable("help") {
+                        HelpGuideScreen(helpItems = helpItems)
+                    }
+
                 }
             }
         }
