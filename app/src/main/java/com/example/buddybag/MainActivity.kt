@@ -4,18 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.buddybag.data.ChecklistItem
-import com.example.buddybag.data.HelpItem
-import com.example.buddybag.data.Phrase
-import com.example.buddybag.data.ShoppingItem
-import com.example.buddybag.ui.ChecklistScreen
-import com.example.buddybag.ui.HelpGuideScreen
-import com.example.buddybag.ui.HomeScreen
-import com.example.buddybag.ui.PhrasebookScreen
-import com.example.buddybag.ui.ShoppingListScreen
+import com.example.buddybag.data.*
+import com.example.buddybag.ui.*
 import com.example.buddybag.ui.theme.BuddyBagTheme
 
 class MainActivity : ComponentActivity() {
@@ -41,6 +35,7 @@ class MainActivity : ComponentActivity() {
             )
         )
 
+
         val checklistItems = listOf(
             ChecklistItem("CAF Registration", "Housing subsidy", false),
             ChecklistItem("Ameli (Health Insurance)", "Create an Ameli account", false),
@@ -56,17 +51,40 @@ class MainActivity : ComponentActivity() {
             ShoppingItem("Toothpaste", false),
             ShoppingItem("Shampoo", false)
         )
+        // 🆘 Local life help items (with full translation)
         val helpItems = listOf(
-            HelpItem("Buy a SIM Card", "Orange, SFR, Free Mobile, Bouygues — visit the nearest telecom store."),
-            HelpItem("Get a Navigo card", "Use it to access buses, metro and RER in Île-de-France."),
-            HelpItem("Grocery Stores", "Franprix, Lidl, Carrefour, Auchan, or Asian/Arab markets."),
-            HelpItem("Emergency Numbers", "112 (EU general), 15 (medical), 17 (police), 18 (fire)."),
-            HelpItem("See a Doctor", "Find local GPs (médecins traitants) on Doctolib.fr")
+            HelpItem(
+                title_en = "Buy a SIM Card",
+                desc_en = "Go to Orange, SFR, Free Mobile, or Bouygues stores.",
+                title_fr = "Acheter une carte SIM",
+                desc_fr = "Rendez-vous chez Orange, SFR, Free Mobile ou Bouygues.",
+                title_zh = "购买电话卡",
+                desc_zh = "前往 Orange、SFR、Free 或 Bouygues 营业厅办理。"
+            ),
+            HelpItem(
+                title_en = "Get a Navigo Card",
+                desc_en = "For metro, RER and bus in Paris region.",
+                title_fr = "Obtenir une carte Navigo",
+                desc_fr = "Pour le métro, le RER et les bus en Île-de-France.",
+                title_zh = "办理 Navigo 公交卡",
+                desc_zh = "在巴黎地区乘坐公交、地铁、RER 的通用交通卡。"
+            ),
+            HelpItem(
+                title_en = "Emergency Numbers",
+                desc_en = "112 (EU), 15 (Medical), 17 (Police), 18 (Fire)",
+                title_fr = "Numéros d'urgence",
+                desc_fr = "112 (UE), 15 (Urgence), 17 (Police), 18 (Pompiers)",
+                title_zh = "紧急联系电话",
+                desc_zh = "112（欧洲通用），15（医疗），17（警察），18（火警）"
+            )
         )
 
 
         setContent {
             val navController = rememberNavController()
+
+            // 🌐 Language state (EN/FR/ZH)
+            var currentLanguage by remember { mutableStateOf(Language.EN) }
 
             BuddyBagTheme {
 
@@ -87,11 +105,16 @@ class MainActivity : ComponentActivity() {
                             onNavigateToHelp = {
                                 navController.navigate("help")
                             }
-
+                            ,
+                            currentLanguage = currentLanguage,
+                            onLanguageChange = { currentLanguage = it }
                         )
                     }
                     composable("phrasebook") {
-                        PhrasebookScreen(phrases = fakePhrases)
+                        PhrasebookScreen(
+                            phrases = fakePhrases,
+                            lang = currentLanguage
+                        )
                     }
                     composable("checklist") {
                         ChecklistScreen(initialItems = checklistItems)
@@ -100,7 +123,7 @@ class MainActivity : ComponentActivity() {
                         ShoppingListScreen(initialItems = shoppingItems)
                     }
                     composable("help") {
-                        HelpGuideScreen(helpItems = helpItems)
+                        HelpGuideScreen(helpItems = helpItems, lang = currentLanguage)
                     }
 
                 }

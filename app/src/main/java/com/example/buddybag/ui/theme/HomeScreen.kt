@@ -27,6 +27,36 @@ fun LanguageSelector(current: Language, onChange: (Language) -> Unit) {
     }
 }
 
+/**
+ * Returns translated label text based on key and language.
+ */
+fun getLabel(key: String, lang: Language): String {
+    return when (key) {
+        "phrasebook" -> when (lang) {
+            Language.EN -> "Phrasebook"
+            Language.FR -> "Phrases utiles"
+            Language.ZH -> "常用短语"
+        }
+        "checklist" -> when (lang) {
+            Language.EN -> "Registration Checklist"
+            Language.FR -> "Liste d'inscription"
+            Language.ZH -> "注册清单"
+        }
+        "shopping" -> when (lang) {
+            Language.EN -> "Shopping Assistant"
+            Language.FR -> "Assistant de courses"
+            Language.ZH -> "购物助手"
+        }
+        "help" -> when (lang) {
+            Language.EN -> "Local Life Guide"
+            Language.FR -> "Guide local"
+            Language.ZH -> "生活指南"
+        }
+        else -> key
+    }
+}
+
+
 @Composable
 fun HomeScreen(
     onNavigateToPhrasebook: () -> Unit,
@@ -58,19 +88,19 @@ fun HomeScreen(
             onClick = onNavigateToPhrasebook,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("📖 Phrasebook")
+            Text("📖 " + getLabel("phrasebook", currentLanguage))
         }
 
         Button(onClick = onNavigateToChecklist, modifier = Modifier.fillMaxWidth()) {
-            Text("📋 Registration Checklist")
+            Text("📋 " + getLabel("checklist", currentLanguage))
         }
 
         Button(onClick = onNavigateToShoppingList, modifier = Modifier.fillMaxWidth()) {
-            Text("🛒 Shopping Assistant")
+            Text("🛒 " + getLabel("shopping", currentLanguage))
         }
 
         Button(onClick = onNavigateToHelp, modifier = Modifier.fillMaxWidth()) {
-            Text("🆘 Local Life Guide")
+            Text("🆘 " + getLabel("help", currentLanguage))
         }
 
         Text(

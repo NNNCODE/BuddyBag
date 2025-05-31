@@ -1,5 +1,5 @@
 package com.example.buddybag.data
-
+import com.example.buddybag.data.Language
 
 // Data model representing a phrase in multiple languages
 data class Phrase(

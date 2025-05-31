@@ -8,9 +8,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.buddybag.data.HelpItem
+import com.example.buddybag.data.Language
 
 @Composable
-fun HelpGuideScreen(helpItems: List<HelpItem>) {
+fun HelpGuideScreen(helpItems: List<HelpItem>, lang:Language) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text("🆘 Local Life Guide", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(8.dp))
@@ -24,9 +25,9 @@ fun HelpGuideScreen(helpItems: List<HelpItem>) {
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(item.title, style = MaterialTheme.typography.titleMedium)
+                        Text(item.getTitle(lang), style = MaterialTheme.typography.titleMedium)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(item.description, style = MaterialTheme.typography.bodySmall)
+                        Text(item.getDescription(lang),style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
