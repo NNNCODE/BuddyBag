@@ -7,13 +7,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.buddybag.data.ChecklistItem
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.buddybag.viewmodel.ChecklistViewModel
 
-
-//	Page: Checkable to-do list
 @Composable
-fun ChecklistScreen(initialItems: List<ChecklistItem>) {
-    var checklist by remember { mutableStateOf(initialItems) }
+fun ChecklistScreen(viewModel: ChecklistViewModel = viewModel()) {
+    val checklistItems by viewModel.checklist.collectAsState()
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text("📋 Registration Checklist", style = MaterialTheme.typography.headlineSmall)
@@ -21,7 +20,7 @@ fun ChecklistScreen(initialItems: List<ChecklistItem>) {
         Spacer(modifier = Modifier.height(8.dp))
 
         LazyColumn {
-            items(checklist) { item ->
+            items(checklistItems) { item ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -37,23 +36,8 @@ fun ChecklistScreen(initialItems: List<ChecklistItem>) {
                         }
                         Checkbox(
                             checked = item.isChecked,
-                            onCheckedChange = {
-                                /*
-                                * ❗ 为什么不行？
-                                你只是改了 item.isChecked
-
-                                然后虽然 checklist = checklist.toList()，但里面的对象还是旧引用
-
-                                Compose 的 diff 算法不会识别对象内部属性变了（因为引用没变）
-                                *
-                                * */
-                                //item.isChecked = it
-                                //checklist = checklist.toList() // Force recomposition
-                                    isChecked ->
-                                checklist = checklist.map { i ->
-                                    if (i == item) i.copy(isChecked = isChecked) else i
-
-                                }
+                            onCheckedChange = { isChecked ->
+                                viewModel.onItemCheckedChanged(item.id, isChecked)
                             }
                         )
                     }

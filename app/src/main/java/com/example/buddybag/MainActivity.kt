@@ -5,15 +5,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.buddybag.data.*
 import com.example.buddybag.ui.*
 import com.example.buddybag.ui.theme.BuddyBagTheme
+import com.example.buddybag.utils.ChecklistDataStore
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.logEvent
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,115 +28,117 @@ class MainActivity : ComponentActivity() {
         val firebaseAnalytics = Firebase.analytics
         firebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, null)
 
-        // Static list of sample phrases for testing
-        val fakePhrases = listOf(
-            Phrase(
-                "Restaurant",
-                "我想点这个",
-                "Je voudrais commander ceci",
-                "I'd like to order this"
-            ),
-            Phrase("Hospital", "我肚子疼", "J'ai mal au ventre", "I have a stomach ache"),
-            Phrase("Supermarket", "这个多少钱？", "C'est combien ?", "How much is this?"),
-            Phrase(
-                "Transport",
-                "请问地铁站在哪？",
-                "Où est la station de métro ?",
-                "Where is the metro?"
-            )
-        )
-
-
-        val checklistItems = listOf(
-            ChecklistItem("CAF Registration", "Housing subsidy", false),
-            ChecklistItem("Ameli (Health Insurance)", "Create an Ameli account", false),
-            ChecklistItem("Open a bank account", "LCL, SG, BNP, Revolut etc.", false),
-            ChecklistItem("Get student card", "From your school", false),
-            ChecklistItem("OFII registration", "For non-EU students", false)
-        )
-        // Static shopping list data
-        val shoppingItems = listOf(
-            ShoppingItem("Milk", false),
-            ShoppingItem("Bread", false),
-            ShoppingItem("Eggs", false),
-            ShoppingItem("Toothpaste", false),
-            ShoppingItem("Shampoo", false)
-        )
-        // 🆘 Local life help items (with full translation)
-        val helpItems = listOf(
-            HelpItem(
-                title_en = "Buy a SIM Card",
-                desc_en = "Go to Orange, SFR, Free Mobile, or Bouygues stores.",
-                title_fr = "Acheter une carte SIM",
-                desc_fr = "Rendez-vous chez Orange, SFR, Free Mobile ou Bouygues.",
-                title_zh = "购买电话卡",
-                desc_zh = "前往 Orange、SFR、Free 或 Bouygues 营业厅办理。"
-            ),
-            HelpItem(
-                title_en = "Get a Navigo Card",
-                desc_en = "For metro, RER and bus in Paris region.",
-                title_fr = "Obtenir une carte Navigo",
-                desc_fr = "Pour le métro, le RER et les bus en Île-de-France.",
-                title_zh = "办理 Navigo 公交卡",
-                desc_zh = "在巴黎地区乘坐公交、地铁、RER 的通用交通卡。"
-            ),
-            HelpItem(
-                title_en = "Emergency Numbers",
-                desc_en = "112 (EU), 15 (Medical), 17 (Police), 18 (Fire)",
-                title_fr = "Numéros d'urgence",
-                desc_fr = "112 (UE), 15 (Urgence), 17 (Police), 18 (Pompiers)",
-                title_zh = "紧急联系电话",
-                desc_zh = "112（欧洲通用），15（医疗），17（警察），18（火警）"
-            )
-        )
-
+        val dataStore = ChecklistDataStore(applicationContext)
 
         setContent {
             val navController = rememberNavController()
 
-            // 🌐 Language state (EN/FR/ZH)
+            // 🌐 Language state
             var currentLanguage by remember { mutableStateOf(Language.EN) }
 
-            BuddyBagTheme {
+            // ✅ 启动时恢复语言
+            LaunchedEffect(Unit) {
+                dataStore.currentLanguage.collect { savedLang ->
+                    savedLang?.let {
+                        currentLanguage = Language.valueOf(it)
+                    }
+                }
+            }
 
+            BuddyBagTheme {
                 // Navigation host controlling screen routes
                 NavHost(navController = navController, startDestination = "home") {
                     composable("home") {
-
                         HomeScreen(
                             onNavigateToPhrasebook = {
+                                val bundle = Bundle().apply {
+                                    putString("language", currentLanguage.name)
+                                }
+                                firebaseAnalytics.logEvent("click_phrasebook", bundle)
                                 navController.navigate("phrasebook")
                             },
                             onNavigateToChecklist = {
+                                val bundle = Bundle().apply {
+                                    putString("language", currentLanguage.name)
+                                }
+                                firebaseAnalytics.logEvent("click_checklist", bundle)
                                 navController.navigate("checklist")
                             },
                             onNavigateToShoppingList = {
+                                val bundle = Bundle().apply {
+                                    putString("language", currentLanguage.name)
+                                }
+                                firebaseAnalytics.logEvent("click_shopping", bundle)
                                 navController.navigate("shopping")
                             },
                             onNavigateToHelp = {
+                                val bundle = Bundle().apply {
+                                    putString("language", currentLanguage.name)
+                                }
+                                firebaseAnalytics.logEvent("click_help", bundle)
                                 navController.navigate("help")
-                            }
-                            ,
+                            },
                             currentLanguage = currentLanguage,
-                            onLanguageChange = { currentLanguage = it }
+                            onLanguageChange = {
+                                currentLanguage = it
+                                lifecycleScope.launch {
+                                    dataStore.saveLanguage(it.name)
+                                }
+                            }
                         )
                     }
+
                     composable("phrasebook") {
                         PhrasebookScreen(
-                            phrases = fakePhrases,
+                            phrases = listOf(
+                                Phrase("Restaurant", "我想点这个", "Je voudrais commander ceci", "I'd like to order this"),
+                                Phrase("Hospital", "我肚子疼", "J'ai mal au ventre", "I have a stomach ache"),
+                                Phrase("Supermarket", "这个多少钱？", "C'est combien ?", "How much is this?"),
+                                Phrase("Transport", "请问地铁站在哪？", "Où est la station de métro ?", "Where is the metro?")
+                            ),
                             lang = currentLanguage
                         )
                     }
+
                     composable("checklist") {
-                        ChecklistScreen(initialItems = checklistItems)
-                    }
-                    composable("shopping") {
-                        ShoppingListScreen(initialItems = shoppingItems)
-                    }
-                    composable("help") {
-                        HelpGuideScreen(helpItems = helpItems, lang = currentLanguage)
+                        ChecklistScreen()
                     }
 
+                    composable("shopping") {
+                        ShoppingListScreen()
+                    }
+
+                    composable("help") {
+                        HelpGuideScreen(
+                            helpItems = listOf(
+                                HelpItem(
+                                    "Buy a SIM Card",
+                                    "Go to Orange, SFR, Free Mobile, or Bouygues stores.",
+                                    "Acheter une carte SIM",
+                                    "Rendez-vous chez Orange, SFR, Free Mobile ou Bouygues.",
+                                    "购买电话卡",
+                                    "前往 Orange、SFR、Free 或 Bouygues 营业厅办理。"
+                                ),
+                                HelpItem(
+                                    "Get a Navigo Card",
+                                    "For metro, RER and bus in Paris region.",
+                                    "Obtenir une carte Navigo",
+                                    "Pour le métro, le RER et les bus en Île-de-France.",
+                                    "办理 Navigo 公交卡",
+                                    "在巴黎地区乘坐公交、地铁、RER 的通用交通卡。"
+                                ),
+                                HelpItem(
+                                    "Emergency Numbers",
+                                    "112 (EU), 15 (Medical), 17 (Police), 18 (Fire)",
+                                    "Numéros d'urgence",
+                                    "112 (UE), 15 (Urgence), 17 (Police), 18 (Pompiers)",
+                                    "紧急联系电话",
+                                    "112（欧洲通用），15（医疗），17（警察），18（火警）"
+                                )
+                            ),
+                            lang = currentLanguage
+                        )
+                    }
                 }
             }
         }

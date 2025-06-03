@@ -7,11 +7,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.buddybag.data.ShoppingItem
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.buddybag.viewmodel.ShoppingViewModel
 
 @Composable
-fun ShoppingListScreen(initialItems: List<ShoppingItem>) {
-    var items by remember { mutableStateOf(initialItems) }
+fun ShoppingListScreen(viewModel: ShoppingViewModel = viewModel()) {
+    val items by viewModel.items.collectAsState()
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text("🛒 Shopping Assistant", style = MaterialTheme.typography.headlineSmall)
@@ -33,9 +34,7 @@ fun ShoppingListScreen(initialItems: List<ShoppingItem>) {
                         Checkbox(
                             checked = item.isChecked,
                             onCheckedChange = { isChecked ->
-                                items = items.map {
-                                    if (it == item) it.copy(isChecked = isChecked) else it
-                                }
+                                viewModel.onItemCheckedChanged(item.id, isChecked)
                             }
                         )
                     }
