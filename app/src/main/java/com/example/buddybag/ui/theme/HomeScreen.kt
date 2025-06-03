@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.buddybag.data.Language
 
-
 @Composable
 fun LanguageSelector(current: Language, onChange: (Language) -> Unit) {
     Row(
@@ -77,12 +76,10 @@ fun HomeScreen(
         // 🔤 Language switch buttons
         LanguageSelector(current = currentLanguage, onChange = onLanguageChange)
 
-
         Text(
             text = "🎒 BuddyBag",
             style = MaterialTheme.typography.headlineLarge
         )
-
         // Navigation buttons for each functional module
         Button(
             onClick = onNavigateToPhrasebook,
@@ -102,7 +99,6 @@ fun HomeScreen(
         Button(onClick = onNavigateToHelp, modifier = Modifier.fillMaxWidth()) {
             Text("🆘 " + getLabel("help", currentLanguage))
         }
-
         Text(
             text = "✅ HomeScreen rendered",
             modifier = Modifier.padding(top = 16.dp)

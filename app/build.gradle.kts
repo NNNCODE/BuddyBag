@@ -1,6 +1,7 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services") // ✅ Add Google Services plugin
 }
 
 android {
@@ -50,6 +51,12 @@ android {
 }
 
 dependencies {
+
+    // ✅ Firebase BoM unified version management
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+
+    // ✅ Firebase Analytics
+    implementation("com.google.firebase:firebase-analytics")
 
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation(libs.androidx.core.ktx)

@@ -11,11 +11,17 @@ import androidx.navigation.compose.rememberNavController
 import com.example.buddybag.data.*
 import com.example.buddybag.ui.*
 import com.example.buddybag.ui.theme.BuddyBagTheme
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val firebaseAnalytics = Firebase.analytics
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, null)
 
         // Static list of sample phrases for testing
         val fakePhrases = listOf(

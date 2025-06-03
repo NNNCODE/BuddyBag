@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "722850216960",
+    "project_id": "buddybag-826ad",
+    "storage_bucket": "buddybag-826ad.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:722850216960:android:e598e725c7e547943fece5",
+        "android_client_info": {
+          "package_name": "com.example.buddybag"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUT8PtgWMHwIr-koUj-xKYF7tX_s9OnIQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
