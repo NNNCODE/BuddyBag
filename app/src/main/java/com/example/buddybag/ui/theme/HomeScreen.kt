@@ -2,11 +2,12 @@ package com.example.buddybag.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.buddybag.data.Language
+import com.example.buddybag.data.ChecklistItem
 
 @Composable
 fun LanguageSelector(current: Language, onChange: (Language) -> Unit) {
@@ -15,13 +16,13 @@ fun LanguageSelector(current: Language, onChange: (Language) -> Unit) {
         modifier = Modifier.fillMaxWidth(),
     ) {
         Button(onClick = { onChange(Language.EN) }) {
-            Text("🇬🇧 EN")
+            Text("\uD83C\uDDEC\uD83C\uDDE7 EN")
         }
         Button(onClick = { onChange(Language.FR) }) {
-            Text("🇫🇷 FR")
+            Text("\uD83C\uDDEB\uD83C\uDDF7 FR")
         }
         Button(onClick = { onChange(Language.ZH) }) {
-            Text("🇨🇳 中文")
+            Text("\uD83C\uDDE8\uD83C\uDDF3 中文")
         }
     }
 }
@@ -51,10 +52,19 @@ fun getLabel(key: String, lang: Language): String {
             Language.FR -> "Guide local"
             Language.ZH -> "生活指南"
         }
+        "profile" -> when (lang) {
+            Language.EN -> "My Profile"
+            Language.FR -> "Mon profil"
+            Language.ZH -> "我的资料"
+        }
+        "add" -> when (lang) {
+            Language.EN -> "Add Custom Item"
+            Language.FR -> "Ajouter une entrée"
+            Language.ZH -> "添加自定义项"
+        }
         else -> key
     }
 }
-
 
 @Composable
 fun HomeScreen(
@@ -62,8 +72,11 @@ fun HomeScreen(
     onNavigateToChecklist: () -> Unit,
     onNavigateToShoppingList: () -> Unit,
     onNavigateToHelp: () -> Unit,
+    onNavigateToProfile: () -> Unit,
+    onNavigateToAddCustomItem: () -> Unit,
     currentLanguage: Language,
-    onLanguageChange: (Language) -> Unit
+    onLanguageChange: (Language) -> Unit,
+    onCustomItemAdded: (ChecklistItem) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -72,35 +85,39 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        // 🔤 Language switch buttons
         LanguageSelector(current = currentLanguage, onChange = onLanguageChange)
 
         Text(
-            text = "🎒 BuddyBag",
+            text = "\uD83C\uDF92 BuddyBag",
             style = MaterialTheme.typography.headlineLarge
         )
-        // Navigation buttons for each functional module
-        Button(
-            onClick = onNavigateToPhrasebook,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("📖 " + getLabel("phrasebook", currentLanguage))
+
+        Button(onClick = onNavigateToPhrasebook, modifier = Modifier.fillMaxWidth()) {
+            Text("\uD83D\uDCD6 " + getLabel("phrasebook", currentLanguage))
         }
 
         Button(onClick = onNavigateToChecklist, modifier = Modifier.fillMaxWidth()) {
-            Text("📋 " + getLabel("checklist", currentLanguage))
+            Text("\uD83D\uDCCB " + getLabel("checklist", currentLanguage))
         }
 
         Button(onClick = onNavigateToShoppingList, modifier = Modifier.fillMaxWidth()) {
-            Text("🛒 " + getLabel("shopping", currentLanguage))
+            Text("\uD83D\uDED2 " + getLabel("shopping", currentLanguage))
         }
 
         Button(onClick = onNavigateToHelp, modifier = Modifier.fillMaxWidth()) {
-            Text("🆘 " + getLabel("help", currentLanguage))
+            Text("\uD83D\uDEA8 " + getLabel("help", currentLanguage))
         }
+
+        Button(onClick = onNavigateToProfile, modifier = Modifier.fillMaxWidth()) {
+            Text("\uD83D\uDC64 " + getLabel("profile", currentLanguage))
+        }
+
+        Button(onClick = onNavigateToAddCustomItem, modifier = Modifier.fillMaxWidth()) {
+            Text("➕ " + getLabel("add", currentLanguage))
+        }
+
         Text(
-            text = "✅ HomeScreen rendered",
+            text = "\u2705 HomeScreen rendered",
             modifier = Modifier.padding(top = 16.dp)
         )
     }

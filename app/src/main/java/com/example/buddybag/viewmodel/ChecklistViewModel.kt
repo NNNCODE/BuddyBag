@@ -15,7 +15,6 @@ class ChecklistViewModel(application: Application) : AndroidViewModel(applicatio
     private val context = application.applicationContext
     private val dataStore = ChecklistDataStore(context)
 
-    // initial data
     private val initialItems = listOf(
         ChecklistItem("caf_registration", "CAF Registration", "Housing subsidy", false),
         ChecklistItem("ameli_account", "Ameli (Health Insurance)", "Create an Ameli account", false),
@@ -31,13 +30,12 @@ class ChecklistViewModel(application: Application) : AndroidViewModel(applicatio
         loadSavedStates()
     }
 
-    // Load the checkbox states saved in DataStore
     private fun loadSavedStates() {
         viewModelScope.launch {
-            initialItems.forEachIndexed { index, item ->
+            initialItems.forEach { item ->
                 dataStore.isItemChecked(item.id).collect { checked ->
-                    _checklist.update { currentList ->
-                        currentList.map {
+                    _checklist.update { list ->
+                        list.map {
                             if (it.id == item.id) it.copy(isChecked = checked) else it
                         }
                     }
@@ -46,7 +44,6 @@ class ChecklistViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
-    //When the user selects / deselects
     fun onItemCheckedChanged(itemId: String, isChecked: Boolean) {
         viewModelScope.launch {
             dataStore.saveItemChecked(itemId, isChecked)
@@ -55,6 +52,12 @@ class ChecklistViewModel(application: Application) : AndroidViewModel(applicatio
                     if (it.id == itemId) it.copy(isChecked = isChecked) else it
                 }
             }
+        }
+    }
+
+    fun addCustomItem(item: ChecklistItem) {
+        _checklist.update { current ->
+            if (current.any { it.id == item.id }) current else current + item
         }
     }
 }

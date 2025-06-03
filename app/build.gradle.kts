@@ -51,7 +51,10 @@ android {
 }
 
 dependencies {
-
+// Firebase Authentication
+    implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
+    // Google Sign-In SDK（之后会用）
+    implementation("com.google.android.gms:play-services-auth:21.1.1")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     // ✅ Firebase BoM unified version management

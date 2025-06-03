@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,6 +14,8 @@ import com.example.buddybag.data.*
 import com.example.buddybag.ui.*
 import com.example.buddybag.ui.theme.BuddyBagTheme
 import com.example.buddybag.utils.ChecklistDataStore
+import com.example.buddybag.viewmodel.AuthViewModel
+import com.example.buddybag.viewmodel.ChecklistViewModel
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.logEvent
@@ -32,11 +35,12 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
+            val authViewModel: AuthViewModel = viewModel()
+            val checklistViewModel: ChecklistViewModel = viewModel()
+            val user by authViewModel.user.collectAsState()
 
-            // 🌐 Language state
             var currentLanguage by remember { mutableStateOf(Language.EN) }
 
-            // ✅ 启动时恢复语言
             LaunchedEffect(Unit) {
                 dataStore.currentLanguage.collect { savedLang ->
                     savedLang?.let {
@@ -46,37 +50,44 @@ class MainActivity : ComponentActivity() {
             }
 
             BuddyBagTheme {
-                // Navigation host controlling screen routes
-                NavHost(navController = navController, startDestination = "home") {
+                val startDestination = if (user != null) "home" else "login"
+
+                NavHost(navController = navController, startDestination = startDestination) {
+                    composable("login") {
+                        LoginScreen(navController = navController, authViewModel = authViewModel)
+                    }
+
                     composable("home") {
                         HomeScreen(
                             onNavigateToPhrasebook = {
-                                val bundle = Bundle().apply {
+                                firebaseAnalytics.logEvent("click_phrasebook", Bundle().apply {
                                     putString("language", currentLanguage.name)
-                                }
-                                firebaseAnalytics.logEvent("click_phrasebook", bundle)
+                                })
                                 navController.navigate("phrasebook")
                             },
                             onNavigateToChecklist = {
-                                val bundle = Bundle().apply {
+                                firebaseAnalytics.logEvent("click_checklist", Bundle().apply {
                                     putString("language", currentLanguage.name)
-                                }
-                                firebaseAnalytics.logEvent("click_checklist", bundle)
+                                })
                                 navController.navigate("checklist")
                             },
                             onNavigateToShoppingList = {
-                                val bundle = Bundle().apply {
+                                firebaseAnalytics.logEvent("click_shopping", Bundle().apply {
                                     putString("language", currentLanguage.name)
-                                }
-                                firebaseAnalytics.logEvent("click_shopping", bundle)
+                                })
                                 navController.navigate("shopping")
                             },
                             onNavigateToHelp = {
-                                val bundle = Bundle().apply {
+                                firebaseAnalytics.logEvent("click_help", Bundle().apply {
                                     putString("language", currentLanguage.name)
-                                }
-                                firebaseAnalytics.logEvent("click_help", bundle)
+                                })
                                 navController.navigate("help")
+                            },
+                            onNavigateToProfile = {
+                                navController.navigate("profile")
+                            },
+                            onNavigateToAddCustomItem = {
+                                navController.navigate("addCustom")
                             },
                             currentLanguage = currentLanguage,
                             onLanguageChange = {
@@ -84,7 +95,8 @@ class MainActivity : ComponentActivity() {
                                 lifecycleScope.launch {
                                     dataStore.saveLanguage(it.name)
                                 }
-                            }
+                            },
+                            onCustomItemAdded = { checklistViewModel.addCustomItem(it) }
                         )
                     }
 
@@ -101,7 +113,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable("checklist") {
-                        ChecklistScreen()
+                        ChecklistScreen(viewModel = checklistViewModel)
                     }
 
                     composable("shopping") {
@@ -138,6 +150,23 @@ class MainActivity : ComponentActivity() {
                             ),
                             lang = currentLanguage
                         )
+                    }
+
+                    composable("profile") {
+                        ProfileScreen(navController = navController)
+                    }
+
+                    composable("addCustom") {
+                        AddCustomItemScreen(navController = navController) { id, text ->
+                            checklistViewModel.addCustomItem(
+                                ChecklistItem(
+                                    id = id,
+                                    title = text,
+                                    description = "",
+                                    isChecked = false
+                                )
+                            )
+                        }
                     }
                 }
             }
